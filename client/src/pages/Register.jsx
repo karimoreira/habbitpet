@@ -1,0 +1,99 @@
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+      alert("Cadastro realizado! Faça login.");
+      navigate("/");
+    } catch (err) {
+      alert("Erro ao cadastrar");
+    }
+  }
+
+  return (
+    <div style={styles.container}>
+      <form style={styles.form} onSubmit={handleRegister}>
+        <h2 style={styles.title}>🐾 Cadastro</h2>
+        <input
+          placeholder="Nome"
+          style={styles.input}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          placeholder="Email"
+          style={styles.input}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          placeholder="Senha"
+          type="password"
+          style={styles.input}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit" style={styles.button}>
+          Cadastrar
+        </button>
+        <p style={styles.link} onClick={() => navigate("/")}>
+          Já tem conta? Entrar
+        </p>
+      </form>
+    </div>
+  );
+}
+
+const styles = {
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    width: "100vw",   
+    backgroundColor: "#1e1e1e",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+    backgroundColor: "#2c2c2c",
+    padding: "2rem",
+    borderRadius: "10px",
+    width: "300px",
+    color: "#fff",
+  },
+  title: {
+    textAlign: "center",
+  },
+  input: {
+    padding: "10px",
+    borderRadius: "5px",
+    border: "none",
+  },
+  button: {
+    padding: "10px",
+    border: "none",
+    borderRadius: "5px",
+    backgroundColor: "#5cb85c",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer",
+  },
+  link: {
+    fontSize: "0.9rem",
+    textAlign: "center",
+    color: "#aaa",
+    cursor: "pointer",
+  },
+};
