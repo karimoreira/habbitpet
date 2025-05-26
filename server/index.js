@@ -51,3 +51,16 @@ app.post('/api/habit/done', auth, async (req, res) => {
     res.status(500).json({ message: 'Erro ao atualizar XP' });
   }
 });
+
+app.put('/api/mascot/name', auth, async (req, res) => {
+  try {
+    const { petName } = req.body;
+    const user = await User.findById(req.user.id);
+    user.petName = petName;
+    await user.save();
+    res.json({ message: "Nome do mascote atualizado!", petName });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao atualizar nome do mascote' });
+  }
+});
+
