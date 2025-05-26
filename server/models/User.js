@@ -7,7 +7,15 @@ const UserSchema = new mongoose.Schema({
   xp: { type: Number, default: 0 },
   level: { type: Number, default: 1 },
   mood: { type: String, default: "feliz" },
-  petName: { type: String, default: "Pikito" }
+  petName: { type: String, default: "Doguinho" },
+
+  habits: [
+    {
+      name: String,
+      done: { type: Boolean, default: false },
+    },
+  ]
+  
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);

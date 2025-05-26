@@ -26,7 +26,7 @@ export default function Register() {
   return (
     <div style={styles.container}>
       <form style={styles.form} onSubmit={handleRegister}>
-        <h2 style={styles.title}>🐾 Cadastro</h2>
+        <h2 style={styles.title}>Cadastro</h2>
         <input
           placeholder="Nome"
           style={styles.input}

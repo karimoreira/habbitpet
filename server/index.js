@@ -64,3 +64,42 @@ app.put('/api/mascot/name', auth, async (req, res) => {
   }
 });
 
+app.post('/api/habit', auth, async (req, res) => {
+  try {
+    const { name } = req.body;
+    const user = await User.findById(req.user.id);
+    user.habits.push({ name });
+    await user.save();
+    res.json(user.habits);
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao adicionar hábito' });
+  }
+});
+
+app.post('/api/habit/:index/done', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const habitIndex = req.params.index;
+
+    if (user.habits[habitIndex]) {
+      user.habits[habitIndex].done = true;
+      user.xp += 10;
+
+      if (user.xp >= 100) {
+        user.xp = 0;
+        user.level += 1;
+        user.mood = "motivado";
+      }
+
+      await user.save();
+      res.json({ xp: user.xp, level: user.level, mood: user.mood, habits: user.habits });
+    } else {
+      res.status(404).json({ message: 'Hábito não encontrado' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao concluir hábito' });
+  }
+});
+
+
+
