@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Lottie from "lottie-react";
+import feliz from "../lottie/feliz.json";
+import triste from "../lottie/triste.json";
+import motivado from "../lottie/motivado.json";
 
 export default function Mascot() {
   const [user, setUser] = useState(null);
   const [newPetName, setNewPetName] = useState("");
   const [newHabit, setNewHabit] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
+  const moodAnimations = { feliz, triste, motivado };
 
   useEffect(() => {
     fetchUserData();
@@ -13,7 +18,7 @@ export default function Mascot() {
 
   function fetchUserData() {
     const token = localStorage.getItem("token");
-    
+
     axios
       .get("http://localhost:5000/api/mascot", {
         headers: { Authorization: `Bearer ${token}` },
@@ -72,14 +77,16 @@ export default function Mascot() {
     });
   }
 
-  function getPetEmoji(mood) {
-    switch (mood) {
-      case "triste": return "😢";
-      case "motivado": return "💪";
-      case "feliz":
-      default: return "🐶";
-    }
-  }
+function handleMoodChange(mood) {
+  const token = localStorage.getItem("token");
+  axios
+    .put("http://localhost:5000/api/mascot/mood", { mood }, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then(() => {
+      fetchUserData();
+    });
+}
 
   if (!user) return <p>Carregando mascote...</p>;
 
@@ -89,7 +96,9 @@ export default function Mascot() {
         <h2>Bem vinde, {user.name}!</h2>
 
         <div style={styles.petBox}>
-          <div style={styles.petEmoji}>{getPetEmoji(user.mood)}</div>
+          <div style={{ width: 200, height: 200 }}>
+            <Lottie animationData={moodAnimations[user.mood]} loop autoplay />
+          </div>
           <div>
             <h3>Mascote: {user.petName}</h3>
             <p>Humor: <strong>{user.mood}</strong></p>
@@ -98,11 +107,8 @@ export default function Mascot() {
           </div>
         </div>
 
-        <div style={styles.actionRow}>
-          <button onClick={handleHabitDone} style={styles.button}>
-            Cumprir hábito
-          </button>
-
+        <div style={styles.row}>
+          <button onClick={handleHabitDone} style={styles.button}>Cumprir hábito</button>
           {!showNameInput && (
             <button onClick={() => setShowNameInput(true)} style={styles.buttonSmall}>
               Editar nome do mascote
@@ -155,6 +161,13 @@ export default function Mascot() {
             </li>
           ))}
         </ul>
+
+        <h3 style={{ marginTop: "2rem" }}>Alterar humor</h3>
+        <div style={styles.row}>
+          <button onClick={() => handleMoodChange("feliz")} style={styles.buttonSmall}>Feliz</button>
+          <button onClick={() => handleMoodChange("triste")} style={styles.buttonSmall}>Triste</button>
+          <button onClick={() => handleMoodChange("motivado")} style={styles.buttonSmall}>Motivado</button>
+        </div>
       </div>
     </div>
   );
@@ -185,10 +198,6 @@ const styles = {
     gap: "1rem",
     margin: "1rem 0",
     justifyContent: "center",
-  },
-  petEmoji: {
-    fontSize: "4rem",
-    animation: "bounce 1.5s infinite",
   },
   button: {
     marginTop: "10px",
@@ -225,9 +234,6 @@ const styles = {
     marginTop: "1rem",
     flexWrap: "wrap",
   },
-  nameChange: {
-    marginTop: "1.5rem",
-  },
   habitList: {
     listStyle: "none",
     padding: 0,
@@ -240,12 +246,5 @@ const styles = {
   habitDone: {
     textDecoration: "line-through",
     color: "#aaa",
-  },
-  actionRow: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "1rem",
-    marginTop: "20px",
-    flexWrap: "wrap",
   },
 };

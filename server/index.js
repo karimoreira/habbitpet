@@ -101,5 +101,17 @@ app.post('/api/habit/:index/done', auth, async (req, res) => {
   }
 });
 
+app.put('/api/mascot/mood', auth, async (req, res) => {
+  try {
+    const { mood } = req.body;
+    const user = await User.findById(req.user.id);
+    user.mood = mood;
+    await user.save();
+    res.json({ mood: user.mood });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao atualizar humor' });
+  }
+});
+
 
 
