@@ -5,33 +5,29 @@ export default function Mascot() {
   const [user, setUser] = useState(null);
   const [newPetName, setNewPetName] = useState("");
   const [newHabit, setNewHabit] = useState("");
+  const [showNameInput, setShowNameInput] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    fetchUserData();
+  }, []);
 
+  function fetchUserData() {
+    const token = localStorage.getItem("token");
+    
     axios
       .get("http://localhost:5000/api/mascot", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data))
       .catch(() => setUser(null));
-  }, []);
+  }
 
   function handleHabitDone() {
     const token = localStorage.getItem("token");
-
     axios
-      .post(
-        "http://localhost:5000/api/habit/done",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .post("http://localhost:5000/api/habit/done", {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         setUser((prev) => ({
           ...prev,
@@ -39,100 +35,58 @@ export default function Mascot() {
           level: res.data.level,
           mood: res.data.mood,
         }));
-      })
-      .catch((err) => {
-        console.error("Erro ao cumprir hábito", err);
       });
   }
 
   function handlePetNameChange() {
     const token = localStorage.getItem("token");
-
     axios
-      .put(
-        "http://localhost:5000/api/mascot/name",
-        { petName: newPetName },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .put("http://localhost:5000/api/mascot/name", { petName: newPetName }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         setUser((prev) => ({ ...prev, petName: res.data.petName }));
         setNewPetName("");
-      })
-      .catch((err) => {
-        console.error("Erro ao atualizar nome do pet", err);
+        setShowNameInput(false);
       });
+  }
+
+  function handleAddHabit() {
+    const token = localStorage.getItem("token");
+    if (!newHabit) return;
+
+    axios.post("http://localhost:5000/api/habit", { name: newHabit }, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(() => {
+      setNewHabit("");
+      fetchUserData();
+    });
+  }
+
+  function handleToggleHabit(index) {
+    const token = localStorage.getItem("token");
+    axios.post(`http://localhost:5000/api/habit/${index}/done`, {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(() => {
+      fetchUserData();
+    });
+  }
+
+  function getPetEmoji(mood) {
+    switch (mood) {
+      case "triste": return "😢";
+      case "motivado": return "💪";
+      case "feliz":
+      default: return "🐶";
+    }
   }
 
   if (!user) return <p>Carregando mascote...</p>;
 
-  function getPetEmoji(mood) {
-    switch (mood) {
-      case "triste":
-        return "😢";
-      case "motivado":
-        return "💪";
-      case "feliz":
-      default:
-        return "🐶";
-    }
-  }
-
- function fetchUserData() {
-  const token = localStorage.getItem("token");
-
-  axios
-    .get("http://localhost:5000/api/mascot", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((res) => setUser(res.data))
-    .catch(() => setUser(null));
-}
-
-function handleAddHabit() {
-  const token = localStorage.getItem("token");
-  if (!newHabit) return;
-
-  axios
-    .post(
-      "http://localhost:5000/api/habit",
-      { name: newHabit },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-    .then(() => {
-      setNewHabit("");
-      fetchUserData(); 
-    });
-}
-
-function handleToggleHabit(index) {
-  const token = localStorage.getItem("token");
-
-  axios
-    .post(`http://localhost:5000/api/habit/${index}/done`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then(() => {
-      fetchUserData(); 
-    });
-}
-
-
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>Bem-vindo, {user.name}!</h2>
+        <h2>Bem vinde, {user.name}!</h2>
 
         <div style={styles.petBox}>
           <div style={styles.petEmoji}>{getPetEmoji(user.mood)}</div>
@@ -144,22 +98,34 @@ function handleToggleHabit(index) {
           </div>
         </div>
 
-        <button onClick={handleHabitDone} style={styles.button}>
-          Cumprir hábito
-        </button>
-
-        <div style={styles.nameChange}>
-          <input
-            type="text"
-            placeholder="Novo nome do mascote"
-            value={newPetName}
-            onChange={(e) => setNewPetName(e.target.value)}
-            style={styles.input}
-          />
-          <button onClick={handlePetNameChange} style={styles.button}>
-            Atualizar nome
+        <div style={styles.actionRow}>
+          <button onClick={handleHabitDone} style={styles.button}>
+            Cumprir hábito
           </button>
 
+          {!showNameInput && (
+            <button onClick={() => setShowNameInput(true)} style={styles.buttonSmall}>
+              Editar nome do mascote
+            </button>
+          )}
+        </div>
+
+        {showNameInput && (
+          <div style={styles.row}>
+            <input
+              type="text"
+              placeholder="Novo nome do mascote"
+              value={newPetName}
+              onChange={(e) => setNewPetName(e.target.value)}
+              style={styles.input}
+            />
+            <button onClick={handlePetNameChange} style={styles.button}>
+              Atualizar nome
+            </button>
+          </div>
+        )}
+
+        <div style={styles.row}>
           <input
             type="text"
             placeholder="Novo hábito"
@@ -170,27 +136,27 @@ function handleToggleHabit(index) {
           <button onClick={handleAddHabit} style={styles.button}>
             Adicionar hábito
           </button>
+        </div>
 
         <h3 style={{ marginTop: "2rem" }}>Meus hábitos</h3>
         <ul style={styles.habitList}>
-        {user.habits?.map((habit, index) => (
+          {user.habits?.map((habit, index) => (
             <li key={index} style={styles.habitItem}>
-            <label>
+              <label>
                 <input
-                type="checkbox"
-                checked={habit.done}
-                onChange={() => handleToggleHabit(index)}
+                  type="checkbox"
+                  checked={habit.done}
+                  onChange={() => handleToggleHabit(index)}
                 />
                 <span style={habit.done ? styles.habitDone : null}>
-                {habit.name}
+                  {habit.name}
                 </span>
-            </label>
+              </label>
             </li>
-         ))}
-    </ul>
- </div>
-</div>
-</div>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
@@ -211,6 +177,7 @@ const styles = {
     textAlign: "center",
     boxShadow: "0 0 10px rgba(0,0,0,0.5)",
     minWidth: "320px",
+    maxWidth: "500px",
   },
   petBox: {
     display: "flex",
@@ -224,7 +191,7 @@ const styles = {
     animation: "bounce 1.5s infinite",
   },
   button: {
-    marginTop: "20px",
+    marginTop: "10px",
     padding: "10px 20px",
     backgroundColor: "#5cb85c",
     color: "#fff",
@@ -233,6 +200,16 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
   },
+  buttonSmall: {
+    padding: "8px 12px",
+    backgroundColor: "#444",
+    color: "#fff",
+    border: "1px solid #5cb85c",
+    borderRadius: "5px",
+    fontSize: "0.9rem",
+    cursor: "pointer",
+    marginTop: "10px",
+  },
   input: {
     padding: "10px",
     borderRadius: "5px",
@@ -240,22 +217,35 @@ const styles = {
     width: "180px",
     marginRight: "0.5rem",
   },
-   nameChange: {
-        marginTop: "1.5rem",
-    },
-    habitList: {
+  row: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "0.5rem",
+    marginTop: "1rem",
+    flexWrap: "wrap",
+  },
+  nameChange: {
+    marginTop: "1.5rem",
+  },
+  habitList: {
     listStyle: "none",
     padding: 0,
     marginTop: "1rem",
-    },
-
-    habitItem: {
     textAlign: "left",
+  },
+  habitItem: {
     marginBottom: "0.5rem",
-    },
-
-    habitDone: {
+  },
+  habitDone: {
     textDecoration: "line-through",
     color: "#aaa",
-    },
+  },
+  actionRow: {
+    display: "flex",
+    justifyContent: "center",
+    gap: "1rem",
+    marginTop: "20px",
+    flexWrap: "wrap",
+  },
 };
