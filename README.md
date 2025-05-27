@@ -21,7 +21,7 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 - React.js (com Vite)
 - Lottie para animações
 - Axios para requisições
-- CSS inline customizado
+- CSS
 
 ### **Backend**
 - Node.js + Express
