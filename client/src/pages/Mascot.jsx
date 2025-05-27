@@ -93,7 +93,7 @@ function handleMoodChange(mood) {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>Bem vinde, {user.name}!</h2>
+        <h2>Olá, {user.name}!</h2>
 
         <div style={styles.petBox}>
           <div style={{ width: 200, height: 200 }}>
