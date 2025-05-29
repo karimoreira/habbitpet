@@ -63,4 +63,6 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 </div>
 
 
+## Próximos passos
+- Sistema de recompensas personalizadas com XP
 
