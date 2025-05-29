@@ -21,7 +21,7 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 - React.js (com Vite)
 - Lottie para animações
 - Axios para requisições
-- CSS inline customizado
+- CSS
 
 ### **Backend**
 - Node.js + Express
@@ -45,20 +45,18 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 
 <div align="center">
 
-<table>
 <tr>
 <td align="center">
-  <img src="https://raw.githubusercontent.com/karimoreira/habbitpet/master/client/src/assets/screenshots/motivadodog.png" width="150" />
+  <img src="https://raw.githubusercontent.com/karimoreira/habbitpet/master/client/src/assets/screenshots/motivadodog.png" width="200" />
 </td>
 <td align="center">
-  <img src="https://raw.githubusercontent.com/karimoreira/habbitpet/master/client/src/assets/screenshots/triste.png" width="150" />
+  <img src="https://raw.githubusercontent.com/karimoreira/habbitpet/master/client/src/assets/screenshots/triste.png" width="200" />
 </td>
 </tr>
-</table>
 
 <br />
 
-<img src="https://raw.githubusercontent.com/karimoreira/habbitpet/master/client/src/assets/screenshots/mascote.png" width="600" />
+<img src="https://raw.githubusercontent.com/karimoreira/habbitpet/master/client/src/assets/screenshots/mascote.png" width="700" />
 
 </div>
 
