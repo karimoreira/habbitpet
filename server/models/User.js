@@ -14,8 +14,15 @@ const UserSchema = new mongoose.Schema({
       name: String,
       done: { type: Boolean, default: false },
     },
+  ],
+
+  rewards: [
+    {
+      title: String,
+      achievedAt: Date,
+    },
   ]
-  
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', UserSchema);
