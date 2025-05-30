@@ -2,7 +2,6 @@
 
 Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábitos diários. Acompanhe seu progresso, ganhe XP, altere o humor do pet e veja animações em tempo real com integração Lottie.
 
----
 
 ## Funcionalidades
 
@@ -10,10 +9,8 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 - Criação e checklist de hábitos
 - Geração de XP e evolução de nível
 - Mascote com humor dinâmico (feliz, triste, motivado)
-- Animações em tempo real com Lottie
-- Personalização de nome do mascote
+- permitir a troca de mascote com 3 pets disponíveis com Lottie
 
----
 
 ## Tecnologias utilizadas
 
@@ -29,7 +26,6 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 - JWT para autenticação
 - Dotenv para configuração segura
 
----
 
 ## Organização do Projeto
 
@@ -39,7 +35,6 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 - Autenticação protegida com middleware
 - Rotas RESTful (habits, user, mascot, mood)
 
----
 
 ## Imagens
 
@@ -61,6 +56,15 @@ Um aplicativo web interativo onde seu mascote evolui conforme você cumpre hábi
 </div>
 
 
-## Próximos passos
-- Sistema de recompensas personalizadas com XP
+## XP
+- adicionei recompensas ou conquistas visuais para cada nível
+- histórico de hábitos 
+- remoção de hábitos completos caso queira
+- exibi "Subiu de nível" apenas quando 4 hábitos forem concluídos e o nível realmente subir
+- backend para garantir que só 1 nível seja ganho por vez
+- o mascote muda para "motivado" ao subir de nível
+
+## Cluster - Banco de dados 
+
+O banco foi criado no meu cluster gratuito do MongoDB Atlas. A coleção users armazena os dados dos usuários, como nome, e-mail, XP, nível, humor, hábitos e nome do mascote. A conexão é feita de forma segura usando variáveis de ambiente e o Mongoose no backend.
 
