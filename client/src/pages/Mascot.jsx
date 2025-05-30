@@ -25,32 +25,37 @@ export default function Mascot() {
       .get("http://localhost:5000/api/mascot", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setUser(res.data))
+      .then((res) => {
+        setUser(res.data);
+      })
       .catch(() => setUser(null));
   }
 
-  function handleHabitDone() {
-    const token = localStorage.getItem("token");
-    axios
-      .post("http://localhost:5000/api/habit/done", {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        setUser((prev) => {
-          if (res.data.level > prev.level) {
+  useEffect(() => {
+    if (!user || !user.habits) return;
+
+    const allHabitsDone =
+      user.habits.length > 0 && user.habits.every((h) => h.done);
+
+    if (allHabitsDone) {
+      const token = localStorage.getItem("token");
+
+      axios
+        .get("http://localhost:5000/api/mascot", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          const updated = res.data;
+
+          if (updated.level > user.level) {
             setShowLevelUp(true);
             setTimeout(() => setShowLevelUp(false), 3000);
           }
 
-          return {
-            ...prev,
-            xp: res.data.xp,
-            level: res.data.level,
-            mood: res.data.mood,
-          };
+          setUser(updated);
         });
-      });
-  }
+    }
+  }, [user?.habits]);
 
   function handlePetNameChange() {
     const token = localStorage.getItem("token");
@@ -77,23 +82,46 @@ export default function Mascot() {
     });
   }
 
-  function handleToggleHabit(index) {
+function handleToggleHabit(index) {
+  const token = localStorage.getItem("token");
+  const previousLevel = user?.level || 1;
+
+  axios.post(`http://localhost:5000/api/habit/${index}/done`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => {
+    const updatedXP = res.data.xp;
+    const updatedLevel = res.data.level;
+    const updatedMood = res.data.mood;
+    const updatedHabits = res.data.habits;
+
+    const allDone = updatedHabits.length > 0 &&
+                    updatedHabits.every(h => h.done);
+
+    const gainedLevel = updatedLevel > previousLevel;
+
+    if (gainedLevel && allDone) {
+      setShowLevelUp(true);
+      setTimeout(() => setShowLevelUp(false), 3000);
+    }
+
+    setUser((prev) => ({
+      ...prev,
+      xp: updatedXP,
+      level: updatedLevel,
+      mood: updatedMood,
+      habits: updatedHabits,
+    }));
+  });
+}
+
+  function handleClearCompletedHabits() {
     const token = localStorage.getItem("token");
-    axios.post(`http://localhost:5000/api/habit/${index}/done`, {}, {
+    axios.delete("http://localhost:5000/api/habits/completed", {
       headers: { Authorization: `Bearer ${token}` },
     }).then(() => {
       fetchUserData();
     });
   }
-
-  function handleClearCompletedHabits() {
-  const token = localStorage.getItem("token");
-  axios.delete("http://localhost:5000/api/habits/completed", {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then(() => {
-    fetchUserData();
-  });
-}
 
   function handleMoodChange(mood) {
     const token = localStorage.getItem("token");
@@ -128,7 +156,7 @@ export default function Mascot() {
               borderRadius: "8px",
               animation: "bounce 1s infinite"
             }}>
-              🎉 Subiu de nível!
+              Subiu de nível!
             </div>
           )}
 
@@ -141,7 +169,6 @@ export default function Mascot() {
         </div>
 
         <div style={styles.row}>
-          <button onClick={handleHabitDone} style={styles.button}>Cumprir hábito</button>
           {!showNameInput && (
             <button onClick={() => setShowNameInput(true)} style={styles.buttonSmall}>
               Editar nome do mascote
@@ -195,9 +222,9 @@ export default function Mascot() {
           ))}
         </ul>
 
-       <button onClick={handleClearCompletedHabits} style={styles.buttonSmall}>
-        Limpar concluídos
-      </button>
+        <button onClick={handleClearCompletedHabits} style={styles.buttonSmall}>
+          Limpar concluídos
+        </button>
 
         <h3 style={{ marginTop: "2rem" }}>Alterar humor</h3>
         <div style={styles.row}>

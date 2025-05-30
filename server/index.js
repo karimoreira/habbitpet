@@ -34,9 +34,9 @@ app.post('/api/habit/done', auth, async (req, res) => {
 
     user.xp += 10;
 
-    const levelUps = Math.floor(user.xp / 40);
-    if (levelUps > 0) {
-      user.level += levelUps;
+    if (user.xp >= 40) {
+      user.level += 1;
+      user.xp -= 40;
       user.mood = "motivado";
     }
 
@@ -87,9 +87,9 @@ app.post('/api/habit/:index/done', auth, async (req, res) => {
 
       user.xp += 10;
 
-      const levelUps = Math.floor(user.xp / 40);
-      if (levelUps > 0) {
-        user.level += levelUps;
+      if (user.xp >= 40) {
+        user.level += 1;
+        user.xp -= 40;
         user.mood = "motivado";
       }
 
