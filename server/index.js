@@ -32,9 +32,9 @@ app.post('/api/habit/done', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
-    user.xp += 1;
+    user.xp += 10; 
 
-    if (user.xp >= 4) {
+    if (user.xp >= 40) { 
       user.xp = 0;
       user.level += 1;
       user.mood = "motivado";
@@ -52,6 +52,7 @@ app.post('/api/habit/done', auth, async (req, res) => {
     res.status(500).json({ message: 'Erro ao atualizar XP' });
   }
 });
+
 
 app.put('/api/mascot/name', auth, async (req, res) => {
   try {
@@ -123,3 +124,14 @@ app.put('/api/mascot/mood', auth, async (req, res) => {
 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
+app.delete('/api/habits/completed', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.habits = user.habits.filter(h => !h.done);
+    await user.save();
+    res.json({ message: "Hábitos concluídos removidos." });
+  } catch (err) {
+    res.status(500).json({ message: 'Erro ao limpar hábitos.' });
+  }
+});

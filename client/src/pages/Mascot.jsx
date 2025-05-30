@@ -86,6 +86,15 @@ export default function Mascot() {
     });
   }
 
+  function handleClearCompletedHabits() {
+  const token = localStorage.getItem("token");
+  axios.delete("http://localhost:5000/api/habits/completed", {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then(() => {
+    fetchUserData();
+  });
+}
+
   function handleMoodChange(mood) {
     const token = localStorage.getItem("token");
     axios
@@ -185,6 +194,10 @@ export default function Mascot() {
             </li>
           ))}
         </ul>
+
+       <button onClick={handleClearCompletedHabits} style={styles.buttonSmall}>
+        Limpar concluídos
+      </button>
 
         <h3 style={{ marginTop: "2rem" }}>Alterar humor</h3>
         <div style={styles.row}>
