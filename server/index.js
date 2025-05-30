@@ -113,5 +113,6 @@ app.put('/api/mascot/mood', auth, async (req, res) => {
   }
 });
 
-
+const xpRoutes = require('./routes/xp');
+app.use('/api/xp', xpRoutes);
 
