@@ -10,6 +10,8 @@ export default function Mascot() {
   const [newPetName, setNewPetName] = useState("");
   const [newHabit, setNewHabit] = useState("");
   const [showNameInput, setShowNameInput] = useState(false);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+
   const moodAnimations = { feliz, triste, motivado };
 
   useEffect(() => {
@@ -34,12 +36,19 @@ export default function Mascot() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setUser((prev) => ({
-          ...prev,
-          xp: res.data.xp,
-          level: res.data.level,
-          mood: res.data.mood,
-        }));
+        setUser((prev) => {
+          if (res.data.level > prev.level) {
+            setShowLevelUp(true);
+            setTimeout(() => setShowLevelUp(false), 3000);
+          }
+
+          return {
+            ...prev,
+            xp: res.data.xp,
+            level: res.data.level,
+            mood: res.data.mood,
+          };
+        });
       });
   }
 
@@ -77,16 +86,16 @@ export default function Mascot() {
     });
   }
 
-function handleMoodChange(mood) {
-  const token = localStorage.getItem("token");
-  axios
-    .put("http://localhost:5000/api/mascot/mood", { mood }, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(() => {
-      fetchUserData();
-    });
-}
+  function handleMoodChange(mood) {
+    const token = localStorage.getItem("token");
+    axios
+      .put("http://localhost:5000/api/mascot/mood", { mood }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        fetchUserData();
+      });
+  }
 
   if (!user) return <p>Carregando mascote...</p>;
 
@@ -99,6 +108,21 @@ function handleMoodChange(mood) {
           <div style={{ width: 200, height: 200 }}>
             <Lottie animationData={moodAnimations[user.mood]} loop autoplay />
           </div>
+
+          {showLevelUp && (
+            <div style={{
+              color: "#fcd34d",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+              backgroundColor: "#3b3b3b",
+              padding: "0.5rem 1rem",
+              borderRadius: "8px",
+              animation: "bounce 1s infinite"
+            }}>
+              🎉 Subiu de nível!
+            </div>
+          )}
+
           <div>
             <h3>Mascote: {user.petName}</h3>
             <p>Humor: <strong>{user.mood}</strong></p>

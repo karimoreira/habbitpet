@@ -7,10 +7,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes);
-
 const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
@@ -36,16 +32,21 @@ app.post('/api/habit/done', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
-    user.xp += 10;
+    user.xp += 1;
 
-    if (user.xp >= 100) {
+    if (user.xp >= 4) {
       user.xp = 0;
       user.level += 1;
-      user.mood = "motivado"; 
+      user.mood = "motivado";
     }
 
     await user.save();
-    res.json({ message: "XP atualizado!", xp: user.xp, level: user.level, mood: user.mood });
+    res.json({
+      message: "XP atualizado!",
+      xp: user.xp,
+      level: user.level,
+      mood: user.mood
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erro ao atualizar XP' });
@@ -76,6 +77,7 @@ app.post('/api/habit', auth, async (req, res) => {
   }
 });
 
+
 app.post('/api/habit/:index/done', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -83,16 +85,22 @@ app.post('/api/habit/:index/done', auth, async (req, res) => {
 
     if (user.habits[habitIndex]) {
       user.habits[habitIndex].done = true;
-      user.xp += 10;
 
-      if (user.xp >= 100) {
+      user.xp += 1;
+
+      if (user.xp >= 4) {
         user.xp = 0;
         user.level += 1;
         user.mood = "motivado";
       }
 
       await user.save();
-      res.json({ xp: user.xp, level: user.level, mood: user.mood, habits: user.habits });
+      res.json({
+        xp: user.xp,
+        level: user.level,
+        mood: user.mood,
+        habits: user.habits
+      });
     } else {
       res.status(404).json({ message: 'Hábito não encontrado' });
     }
@@ -113,6 +121,5 @@ app.put('/api/mascot/mood', auth, async (req, res) => {
   }
 });
 
-const xpRoutes = require('./routes/xp');
-app.use('/api/xp', xpRoutes);
-
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
