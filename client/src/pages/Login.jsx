@@ -17,7 +17,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       navigate("/mascot");
     } catch (err) {
-      alert("Login falhou");
+      alert("usuário não encontrado");
     }
   }
 

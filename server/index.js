@@ -32,11 +32,11 @@ app.post('/api/habit/done', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
 
-    user.xp += 10; 
+    user.xp += 10;
 
-    if (user.xp >= 40) { 
-      user.xp = 0;
-      user.level += 1;
+    const levelUps = Math.floor(user.xp / 40);
+    if (levelUps > 0) {
+      user.level += levelUps;
       user.mood = "motivado";
     }
 
@@ -52,7 +52,6 @@ app.post('/api/habit/done', auth, async (req, res) => {
     res.status(500).json({ message: 'Erro ao atualizar XP' });
   }
 });
-
 
 app.put('/api/mascot/name', auth, async (req, res) => {
   try {
@@ -78,7 +77,6 @@ app.post('/api/habit', auth, async (req, res) => {
   }
 });
 
-
 app.post('/api/habit/:index/done', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -87,11 +85,11 @@ app.post('/api/habit/:index/done', auth, async (req, res) => {
     if (user.habits[habitIndex]) {
       user.habits[habitIndex].done = true;
 
-      user.xp += 1;
+      user.xp += 10;
 
-      if (user.xp >= 4) {
-        user.xp = 0;
-        user.level += 1;
+      const levelUps = Math.floor(user.xp / 40);
+      if (levelUps > 0) {
+        user.level += levelUps;
         user.mood = "motivado";
       }
 
